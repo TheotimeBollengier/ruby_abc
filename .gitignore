@@ -1,0 +1,11 @@
+*.o
+*.swp
+*.log
+*.d
+ext/Makefile
+ext/ruby_abc.so
+ext/abc/arch_flags
+ext/abc/libabc.so
+lib/ruby_abc/ruby_abc.so
+doc
+ruby_abc-*.gem
