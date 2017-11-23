@@ -11,7 +11,7 @@ Documentation on *abc* can be found on its website:
 
 The source code of *abc* is included in this gem, 
 it was cloned on 2017/11/22 from :  
-[http://people.eecs.berkeley.edu/~alanmi/abc/](http://people.eecs.berkeley.edu/~alanmi/abc/)  
+[https://bitbucket.org/alanmi/abc](https://bitbucket.org/alanmi/abc)
 It is under MIT license.
 
 
