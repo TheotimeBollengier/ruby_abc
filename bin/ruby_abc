@@ -9,12 +9,12 @@ optparse = OptionParser.new do |opts|
 	opts.banner = "Usage: #{File.basename(__FILE__)} [options] -i <input_file> -o <output_file>"
 
 	options[:inputFileName] = nil
-	opts.on('-i', '--input FILE', 'Input BLIF file') do |file|
+	opts.on('-i', '--input FILE', 'Input file name') do |file|
 		options[:inputFileName] = file
 	end
 
 	options[:outputFileName] = nil
-	opts.on('-o', '--output FILE', 'Output netlist to FILE') do |file|
+	opts.on('-o', '--output FILE', 'Output file name') do |file|
 		options[:outputFileName] = file
 	end
 

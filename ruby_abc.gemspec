@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
 	s.name        = 'ruby_abc'
-	s.version     = '0.0.3'
+	s.version     = '0.0.4'
 	s.date        = '2017-11-22'
 	s.summary     = 'ruby_abc is a ruby C extension wrapping the Berkeley ABC logic synthesis system.'
 	s.description = "ruby_abc is a ruby C extension intended to allow the use of ABC from Ruby.\nABC is a system for sequential synthesis and verification, developped at the University of California, Berkeley.\nABC website: http://people.eecs.berkeley.edu/~alanmi/abc/"
@@ -9,12 +9,12 @@ Gem::Specification.new do |s|
 	s.homepage    = 'http://github.com/TheotimeBollengier/ruby_abc'
 	s.license     = 'MIT'
 	s.extensions  = ['Rakefile']
-	s.executables << 'rubyabc_synthesis'
+	s.executables = ['ruby_abc']
 	s.files       = ['README.md',
 	                 'LICENSE',
 	                 'Rakefile',
 	                 'lib/ruby_abc.rb',
-	                 'bin/rubyabc_synthesis',
+	                 'bin/ruby_abc',
 	                 'test/test_ruby_abc.rb',
 	                 'test/generic_netlist.blif',
 	                 'ext/extconf.rb',

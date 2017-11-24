@@ -14,7 +14,7 @@ golden_mapped_nb_nodes           = 80
 golden_mapped_nb_latches         = 45
 golden_mapped_nb_levels          =  6
 
-netlist_filename = "#{File.dirname(File.expand_path(__FILE__))}/generic_netlist.blif"
+netlist_filename = File.join(File.dirname(File.expand_path(__FILE__)), 'generic_netlist.blif')
 
 ABC.echo_commands = false
 
