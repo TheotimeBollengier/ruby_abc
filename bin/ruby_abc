@@ -11,28 +11,23 @@ optparse = OptionParser.new do |opts|
 	opts.banner = "Usage: #{File.basename(__FILE__)} [options] -i <input_file> -o <output_file>"
 
 	options[:inputFileName] = nil
-	opts.on('-i', '--input FILE', 'Input BLIF file') do |file|
+	opts.on('-i', '--input FILE', 'Input file') do |file|
 		options[:inputFileName] = file
 	end
 
 	options[:outputFileName] = nil
-	opts.on('-o', '--output FILE', 'Output netlist to FILE') do |file|
+	opts.on('-o', '--output FILE', 'Write processed netlist to FILE') do |file|
 		options[:outputFileName] = file
 	end
 
-	options[:retime] = false
-	opts.on('-r', '--retime', 'Retime netlist') do
-		options[:retime] = true
+	options[:sweep] = false
+	opts.on('-s', '--sweep', 'Sweep logic network to remove dangling nodes') do
+		options[:sweep] = true
 	end
 
-	options[:zero] = false
-	opts.on('-z', '--zero', 'Set latches initial value to zero') do
-		options[:zero] = true
-	end
-
-	options[:lcorr] = false
-	opts.on('-l', '--lcorr', 'Computes latch correspondence using 1-step induction') do
-		options[:lcorr] = true
+	options[:k] = nil
+	opts.on('-k', '--lut_inputs K', "Map to K-input LUTs.") do |k|
+		options[:k] = k.to_i
 	end
 
 	options[:area] = false
@@ -40,14 +35,29 @@ optparse = OptionParser.new do |opts|
 		options[:area] = true
 	end
 
-	options[:sweep] = false
-	opts.on('-w', '--sweep', 'Sweep logic network to remove dangling nodes') do
-		options[:sweep] = true
+	options[:retime] = false
+	opts.on('-r', '--retime', 'Retime netlist') do
+		options[:retime] = true
 	end
 
-	options[:k] = nil
-	opts.on('-k', '--lut_inputs K', "Map to K-input LUTs.") do |k|
-		options[:k] = k.to_i
+	options[:lcorr] = false
+	opts.on('-l', '--lcorr', 'Computes latch correspondence using 1-step induction') do
+		options[:lcorr] = true
+	end
+
+	options[:zero] = false
+	opts.on('-z', '--zero', 'Set latches initial value to zero') do
+		options[:zero] = true
+	end
+
+	options[:echo] = false
+	opts.on('-e', '--echo', 'Echo commands sent to ABC') do
+		options[:echo] = true
+	end
+
+	options[:quiet] = false
+	opts.on('-q', '--quiet', 'Do not print netlist statistics during synthesis') do
+		options[:quiet] = true
 	end
 
 	opts.on( '-h', '--help', 'Display this help' ) do
@@ -60,6 +70,8 @@ optparse.parse!
 
 abort "Missing input file name.\n#{optparse}" if options[:inputFileName].nil?
 
+ABC::echo_commands = not(not(options[:echo]))
+
 ABC::synthesis(
 	input:   options[:inputFileName], 
 	output:  options[:outputFileName], 
@@ -68,6 +80,7 @@ ABC::synthesis(
 	retime:  options[:retime], 
 	lcorr:   options[:lcorr], 
 	area:    options[:area], 
-	lut_map: options[:k]
+	lut_map: options[:k],
+	verbose: not(options[:quiet])
 )
 

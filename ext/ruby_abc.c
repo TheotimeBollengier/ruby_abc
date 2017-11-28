@@ -137,12 +137,15 @@ static VALUE rubyabc_n_levels(VALUE self)
  */
 static VALUE rubyabc_run_command(VALUE self, VALUE cmd)
 {
+	VALUE printed_str;
+
 	Check_Type(cmd, T_STRING);
 
-	cmd = rb_sprintf("Command: \"%"PRISVALUE"\"", cmd);
 
-	if (rubyabc_echo_commands)
-		rb_io_puts(1, &cmd, rb_stdout);
+	if (rubyabc_echo_commands) {
+		printed_str = rb_sprintf("Command: \"%"PRIsVALUE"\"", cmd);
+		rb_io_puts(1, &printed_str, rb_stdout);
+	}
 
 	if (rubyabc_c_run_command(StringValueCStr(cmd)))
 		return Qfalse;
