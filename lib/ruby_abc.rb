@@ -36,15 +36,15 @@ module ABC
 		puts "Outputs: ..#{(' ' + n_pos.to_s).rjust(max_len, '.')}"     if n_pos
 		puts "Nodes: ....#{(' ' + n_nodes.to_s).rjust(max_len, '.')}"   if n_nodes
 		puts "Latches: ..#{(' ' + n_latches.to_s).rjust(max_len, '.')}" if n_latches
-		puts "Levels: ...#{(' ' + n_levels.to_s).rjust(max_len, '.')}"  if n_levels
 		puts "And gates: #{(' ' + n_ands.to_s).rjust(max_len, '.')}"    if n_ands
+		puts "Levels: ...#{(' ' + n_levels.to_s).rjust(max_len, '.')}"  if n_levels
 		return nil
 	end # ABC::print_stats
 
 
 	##
 	# call-seq:
-	# optimize -> nb_ands
+	# optimize (verbose: true) -> nb_ands
 	#
 	# Combinatorial synthesis of the network. 
 	# This method loops the command "resyn; resyn2, resyn3, print_stats" and stops when the number of AND gates stop decreasing.
@@ -58,10 +58,11 @@ module ABC
 	#
 	#  ABC.optimize
 	#
-	def self.optimize
+	def self.optimize (verbose: true)
+		cmd = 'resyn; resyn2; resyn3' + (verbose ? '; ps' : '')
 		n_ands = ABC::nb_ands
 		loop do
-			ABC::run_command('resyn; resyn2; resyn3; ps')
+			ABC::run_command(cmd)
 			new_n_ands = ABC::nb_ands
 			break unless new_n_ands < n_ands
 			n_ands = new_n_ands
@@ -72,19 +73,19 @@ module ABC
 
 	##
 	# call-seq:
-	# map (lut_size, optimize_for_area = false) -> nb_nodes
+	# map (lut_size, optimize_for_area = false, verbose: true) -> nb_nodes
 	#
 	# Map the logic network to nodes with at most +lut_size+ inputs.
 	# If +optimize_for_area+ is true, minimize the number of nodes instead of minimizing the logic level of the network.
 	#
 	# This method loops the command: 
-	#  "choice; if -K #{lut_size}#{optimize_for_area ? ' -a':''}; ps"
+	#  "choice2; if -K #{lut_size}#{optimize_for_area ? ' -a':''}; ps"
 	# and stops when the number of nodes stop decreasing.
 	#
 	#  ABC.map(4)
 	#
-	def self.map (k, optimize_area = false)
-		map_cmd = "choice; if -K #{k}#{optimize_area ? ' -a':''}; ps"
+	def self.map (k, optimize_area = false, verbose: true)
+		map_cmd = "choice2; if -K #{k}#{optimize_area ? ' -a':''}#{verbose ? '; ps':''}"
 
 		n_nodes = -1
 		loop do
@@ -117,7 +118,7 @@ module ABC
 
 	##
 	# call-seq:
-	# synthesis (input: nil, output: nil, zero: false, sweep: false, retime: false, lcorr: false, area: false, lut_map: nil, help: nil)
+	# synthesis (input: nil, output: nil, zero: false, sweep: false, retime: false, lcorr: false, area: false, lut_map: nil, verbose: true, help: nil)
 	#
 	# This method is an atempt to automate the logic synthesis process (combinatorial and sequential) according to some parameters.
 	#
@@ -133,7 +134,7 @@ module ABC
 	#
 	#  ABC.synthesis(input: 'generic.blif', output: 'maped.blif', lcorr: true, lut_map: 4, area: true)
 	#
-	def self.synthesis(input: nil, output: nil, zero: false, sweep: false, retime: false, lcorr: false, area: false, lut_map: nil, help: nil)
+	def self.synthesis(input: nil, output: nil, zero: false, sweep: false, retime: false, lcorr: false, area: false, lut_map: nil, help: nil, verbose: true)
 		if help then
 			puts <<EOS
 ABC::synthesis keyword arguments:
@@ -158,7 +159,7 @@ EOS
 		ABC::print_stats
 		puts "-----------------------"
 
-		ABC::ps
+		ABC::ps if verbose
 
 		if sweep then
 			ABC::sweep
@@ -166,43 +167,47 @@ EOS
 		end
 
 		if zero and ABC::nb_latches > 0 then
-			ABC::run_command 'strash; zero; ps'
+			ABC::run_command 'strash; zero'
 		else
-			ABC::run_command 'strash; ps'
+			ABC::run_command 'strash'
 		end
+		ABC::ps if verbose
 
 		ABC::lcorr if (lcorr and ABC::nb_latches > 0)
 
 		if sweep then
 			ABC::ssweep
 			ABC::csweep
-			ABC::ps
+			ABC::ps if verbose
 		end
 
-		ABC::optimize
+		ABC::optimize(verbose: verbose)
 
 		if retime and ABC::nb_latches > 0 then
 			level = ABC::nb_levels
-			ABC::run_command('retime; strash; ps')
+			ABC::run_command('retime; strash')
+			ABC::ps if verbose
 			if ABC::nb_levels >= level then
-				ABC::run_command('dretime; strash; ps')
+				ABC::run_command('dretime; strash')
+				ABC::ps if verbose
 			end
-			ABC::optimize
+			ABC::optimize(verbose: verbose)
 		end
 
 		ABC::zero if zero
 
 		if lut_map then
 			raise "Expecting a strictly positive integer for argument :lut_map" unless (lut_map.kind_of?(Integer) and lut_map > 0)
-			ABC::map(lut_map, not(not(area)))
+			ABC::map(lut_map, not(not(area)), verbose: verbose)
 		end
 
 		if sweep then
-			ABC::run_command 'sop; sweep; resyn; resyn2; resyn3; scleanup; resyn; scleanup; scleanup; scleanup; strash; ssweep; csweep; ps'
-			ABC::optimize
+			ABC::run_command 'sop; sweep; resyn; resyn2; resyn3; scleanup; resyn; scleanup; scleanup; scleanup; strash; ssweep; csweep'
+			ABC::ps if verbose
+			ABC::optimize(verbose: verbose)
 			if lut_map then
 				raise "Expecting a strictly positive integer for argument :lut_map" unless (lut_map.kind_of?(Integer) and lut_map > 0)
-				ABC::map(lut_map, not(not(area)))
+				ABC::map(lut_map, not(not(area)), verbose: verbose)
 			end
 		end
 
@@ -210,7 +215,7 @@ EOS
 			ABC::run_command 'strash; lcorr'
 			if lut_map then
 				raise "Expecting a strictly positive integer for argument :lut_map" unless (lut_map.kind_of?(Integer) and lut_map > 0)
-				ABC::map(lut_map, not(not(area)))
+				ABC::map(lut_map, not(not(area)), verbose: verbose)
 			end
 		end
 

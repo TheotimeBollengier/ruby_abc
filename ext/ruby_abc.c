@@ -139,6 +139,8 @@ static VALUE rubyabc_run_command(VALUE self, VALUE cmd)
 {
 	Check_Type(cmd, T_STRING);
 
+	cmd = rb_sprintf("Command: \"%"PRISVALUE"\"", cmd);
+
 	if (rubyabc_echo_commands)
 		rb_io_puts(1, &cmd, rb_stdout);
 
