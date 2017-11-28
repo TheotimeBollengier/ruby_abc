@@ -4,7 +4,7 @@ require_relative 'ruby_abc/ruby_abc.so'
 
 
 module ABC
-	VERSION = '0.0.4'
+	VERSION = '0.0.5'
 
 	##
 	# call-seq:

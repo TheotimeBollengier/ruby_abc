@@ -38,7 +38,7 @@ desc 'compile libabc.so and abc'
 task libabc => abcsrc do
 	abort "Library libpthread was not found" if !have_library('pthread')
 	abort "Library libdl was not found"      if !have_library('dl')
-	abort "Library librt was not found"      if !have_library('rt')
+	#abort "Library librt was not found"      if !have_library('rt') ## librt.a is not on Mac OS
 	wd = Dir.getwd
 	Dir.chdir(abc_path)
 	sh "make -j4 ABC_USE_PIC=true OPTFLAGS='-O2' ABC_USE_NO_READLINE=true libabc.so"
