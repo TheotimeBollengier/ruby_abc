@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
 	s.name        = 'ruby_abc'
-	s.version     = '0.0.5'
+	s.version     = '0.0.6'
 	s.date        = '2017-11-28'
 	s.summary     = 'ruby_abc is a ruby C extension wrapping the Berkeley ABC logic synthesis system.'
 	s.description = "ruby_abc is a ruby C extension intended to allow the use of ABC from Ruby.\nABC is a system for sequential synthesis and verification, developped at the University of California, Berkeley.\nABC website: http://people.eecs.berkeley.edu/~alanmi/abc/"
